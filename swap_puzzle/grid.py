@@ -57,8 +57,13 @@ class Grid():
         """
         Checks is the current state of the grid is sorte and returns the answer as a boolean.
         """
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        raise NotImplementedError
+        k=1
+        for i in range (self.m):
+            for j in range (self.n):
+                if self.state[i][j]!=k :
+                    return False
+                else : k+=1
+        return True
 
     def swap(self, cell1, cell2):
         """
@@ -69,8 +74,13 @@ class Grid():
         cell1, cell2: tuple[int]
             The two cells to swap. They must be in the format (i, j) where i is the line and j the column number of the cell. 
         """
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        raise NotImplementedError
+        i1,j1,i2,j2=cell1[0],cell1[1],cell2[0],cell2[1]
+        if i1>i2+1 or i2>i1+1 or j1>j2+1 or j2>j1+1 or i1>self.m or i2>self.m or j1>self.n or j2>self.n:
+            print(f"swap",(i1,j1),(i2,j2), "is impossible")
+        else : 
+            old_cell1= self.state[i1][j1]
+            self.state[i1][j1]=self.state[i2][j2]
+            self.state[i2][j2]=old_cell1
 
     def swap_seq(self, cell_pair_list):
         """
@@ -82,8 +92,33 @@ class Grid():
             List of swaps, each swap being a tuple of two cells (each cell being a tuple of integers). 
             So the format should be [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...].
         """
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        raise NotImplementedError
+        for i in cell_pair_list:
+            self.swap(i[0],i[1])
+
+    def position (self,value):
+        for i in range (self.m):
+            for j in range (self.n):
+                if self.state[i][j]==value:
+                    return (i,j)
+    
+    def get_solution(self):
+        """
+        Solves the grid and returns the sequence of swaps at the format 
+        [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
+        """
+        Solution=[]
+        for k in range (1,self.n*self.m +1):
+            (i,j)=self.position(k)
+            sorted=Grid(self.m,self.n)
+            goal= sorted.position(k)
+            print(goal)
+            for right in range (j,self.n-1):
+                Solution.append(((i,right),(i,right+1)))
+            for up in range (i-goal[1]):
+                Solution.append(((i-up,self.n-1),(i-up-1,self.n-1)))
+            for left in range (j-goal[0]):
+                Solution.append(((goal[0],self.n-1-left),(goal[0],self.n-left-2)))
+        return Solution    
 
     @classmethod
     def grid_from_file(cls, file_name): 
