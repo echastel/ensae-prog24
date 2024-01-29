@@ -101,24 +101,35 @@ class Grid():
                 if self.state[i][j]==value:
                     return (i,j)
     
+    
+
     def get_solution(self):
-        """
-        Solves the grid and returns the sequence of swaps at the format 
-        [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
-        """
-        Solution=[]
-        for k in range (1,self.n*self.m +1):
-            (i,j)=self.position(k)
+            """
+            Solves the grid and returns the sequence of swaps at the format 
+            [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
+            """
             sorted=Grid(self.m,self.n)
-            goal= sorted.position(k)
-            print(goal)
-            for right in range (j,self.n-1):
-                Solution.append(((i,right),(i,right+1)))
-            for up in range (i-goal[1]):
-                Solution.append(((i-up,self.n-1),(i-up-1,self.n-1)))
-            for left in range (j-goal[0]):
-                Solution.append(((goal[0],self.n-1-left),(goal[0],self.n-left-2)))
-        return Solution    
+            Solution=[] 
+        
+            for k in range (1, self.m*self.n+1):
+                    (i,j)=self.position(k) #the position of the value k in the given grid
+                    goal= sorted.position(k)
+                    print((i,j))
+                    if j> goal[1]: # if the value is too much to the right
+                            for left in range (j-goal[1]):
+                                    
+                                    Solution.append(((i,j-left),(i,j-left-1)))
+                                    self.swap((i,j-left),(i,j-left-1))
+                    if j< goal[1]: # if the value is too much to the left
+                            for right in range (j, goal[1]):
+
+                                    Solution.append(((i,right),(i,right+1)))
+                                    self.swap((i,right),(i,right+1))
+                    if i > goal[0]: # if the value is not on the correct line
+                            for up in range (i, goal[0], -1):
+                                    Solution.append(((up,goal[1]),(up - 1,goal[1])))
+                                    self.swap((up,goal[1]),(up-1,goal[1]))
+            return Solution 
 
     @classmethod
     def grid_from_file(cls, file_name): 
