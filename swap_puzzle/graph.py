@@ -103,19 +103,19 @@ class Graph:
         To_explore.append((src,[src]))
         
         while len(To_explore)>0 :
-            if node not in Been_there:
-                
-                current, path_current=To_explore.pop()
-                
-                if current == dst:
-                    Been_there.append(Current)
-                    path_current.append(dst)
-                    return(path_current)
-                    
-                for node in self.graph[current]:  
-                    Been_there.append(node)
-                    path_current.append(node)
-                    To_explore.append((node, path_current))
+            current, path_current=To_explore.pop(0)
+            print(To_explore)
+            Been_there.append(current)
+            if current == dst:
+                Been_there.append(current)
+                return(path_current)
+                        
+            for neighbor in self.graph[current]:  
+                if neighbor not in Been_there and neighbor not in [i[0] for i in To_explore]:
+                    New_path=copy.deepcopy(path_current)+[neighbor]
+                    To_explore.append((neighbor, New_path))
+        return None
+
 
     
 

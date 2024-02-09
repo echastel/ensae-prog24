@@ -4,6 +4,7 @@ This is the grid module. It contains the Grid class and its associated methods.
 
 import random
 import matplotlib.pyplot as plt
+import itertools
 
 class Grid():
     """
@@ -95,6 +96,21 @@ class Grid():
         """
         for i in cell_pair_list:
             self.swap(i[0],i[1])
+    
+    def Grid_as_tuple (self) : 
+        Grid_tuple = tuple(tuple(i) for i in self.state)
+        return Grid_tuple
+
+    def get_graph (self) :
+        Dots=[i for i in j for j in self.state]
+        Nodes = list(itertools.permutations(Dots))
+        self.Graph=
+        for i in Nodes :
+            for j in Nodes :
+                if j!=i :
+                    if there_is_a_swap(i,j) :
+
+    def there_is_a_swap(G1,G2):
 
     def position (self,value):
         for i in range (self.m):
