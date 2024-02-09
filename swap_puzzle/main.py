@@ -36,9 +36,4 @@ g0_unchanged= Grid.grid_from_file(file_name)
 print(g0.Grid_as_tuple())
 print(g2.Grid_as_tuple())
 
-
-print()
-
-A=[[1,2],[3,4]]
-Dots=[i  for j in A for i in j]
-print(list(itertools.permutations(Dots)))
+g0_unchanged.get_graph()

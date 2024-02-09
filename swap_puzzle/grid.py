@@ -1,7 +1,7 @@
 """
 This is the grid module. It contains the Grid class and its associated methods.
 """
-
+from graph import Graph
 import random
 import matplotlib.pyplot as plt
 import itertools
@@ -77,7 +77,7 @@ class Grid():
             The two cells to swap. They must be in the format (i, j) where i is the line and j the column number of the cell. 
         """
         i1,j1,i2,j2=cell1[0],cell1[1],cell2[0],cell2[1]
-        if i1>i2+1 or i2>i1+1 or j1>j2+1 or j2>j1+1 or i1>self.m or i2>self.m or j1>self.n or j2>self.n:
+        if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
             print(f"swap",(i1,j1),(i2,j2), "is impossible")
         else : 
             old_cell1= self.state[i1][j1]
@@ -98,19 +98,48 @@ class Grid():
             self.swap(i[0],i[1])
     
     def Grid_as_tuple (self) : 
-        Grid_tuple = tuple(tuple(i) for i in self.state)
+        Grid_tuple = tuple(i for i in self.state)
         return Grid_tuple
 
     def get_graph (self) :
-        Dots=[i for i in j for j in self.state]
+        Dots=[]
+        for i in self.state :
+            for j in i :
+                Dots.append(j)
         Nodes = list(itertools.permutations(Dots))
-        self.Graph=
-        for i in Nodes :
-            for j in Nodes :
-                if j!=i :
-                    if there_is_a_swap(i,j) :
+        self.graph=Graph(Nodes)
+        L=len(Nodes)
+        for i in range(L) :
+            for j in range(i+1,L) :
+                if self.there_is_a_swap(Nodes[i],Nodes[j]) :
+                    self.graph.add_edge(Nodes[i],Nodes[j])
+        return(self.graph)
 
-    def there_is_a_swap(G1,G2):
+    def there_is_a_swap(self,G1,G2):
+        diff=[]
+        for i in range (len(G1)):
+            if G1[i]!=G2[i] :
+                diff.append(i)
+        if len(diff)!=2:
+            return False
+        else : 
+            pos1=(diff[0]//self.n,diff[0]%self.n-1)
+            pos2=(diff[1]//self.n,diff[1]%self.n-1)
+            i1,j1=pos1[0],pos1[1]
+            i2,j2=pos2[0],pos2[1]
+            G1=self.list_to_grid(G1)
+            G2=self.list_to_grid(G2)
+            if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
+                return False
+        return True
+
+    def list_to_grid (self,G) :
+        L=[G[0:self.n]]
+        for i in range (1,self.m):
+            L.append (G[i*self.n:(i+1)*self.n])
+        return L
+
+
 
     def position (self,value):
         for i in range (self.m):
@@ -156,6 +185,12 @@ class Grid():
                                     self.swap((up,goal[1]),(up-1,goal[1]))
             return Solution 
 
+    def get_solution2 (self):
+        G=self.get_graph()
+        Seq=G.bfs( "to add")
+        Seq_Grid=[]
+        for i in Seq:
+            Seq_Grid.append(list_to_grid(i))
     @classmethod
     def grid_from_file(cls, file_name): 
         """
