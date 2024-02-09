@@ -3,6 +3,7 @@ This is the grid module. It contains the Grid class and its associated methods.
 """
 
 import random
+import matplotlib.pyplot as plt
 
 class Grid():
     """
@@ -101,7 +102,15 @@ class Grid():
                 if self.state[i][j]==value:
                     return (i,j)
     
-    
+    def print_grid (self): #représentation graphique séance 1 question 4
+        fig,ax = plt.subplots()
+        #hide axes
+        fig.patch.set_visible(False)
+        ax.axis('off')
+        ax.axis('tight')
+        ax=plt.table(cellText=self.state,cellLoc='center')
+        fig.tight_layout()
+        plt.show()
 
     def get_solution(self):
             """

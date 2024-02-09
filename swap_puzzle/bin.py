@@ -1,3 +1,5 @@
+import matplotlib as plt
+
 sorted=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)]
         """
        Creates a list equal to the sorted grid
@@ -46,3 +48,5 @@ def get_solution(self):
 
 for i in range(6,2, -1):
         print(i)
+
+

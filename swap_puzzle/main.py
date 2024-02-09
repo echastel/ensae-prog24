@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 print("Hello world")
 
 n=5
@@ -27,3 +29,5 @@ g2sort=g2.get_solution()
 
 print(g2sort)
 print(g2)
+
+g0_unchanged= Grid.grid_from_file(file_name)

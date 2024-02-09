@@ -1,7 +1,7 @@
 """
 This is the graph module. It contains a minimalistic Graph class.
 """
-
+import copy 
 class Graph:
     """
     A class representing undirected graphs as adjacency lists. 
@@ -81,7 +81,7 @@ class Graph:
         self.nb_edges += 1
         self.edges.append((node1, node2))
 
-    def bfs(self, src, dst): 
+    def bfs(self, src, dst):                
         """
         Finds a shortest path from src to dst by BFS.  
 
@@ -97,8 +97,27 @@ class Graph:
         path: list[NodeType] | None
             The shortest path from src to dst. Returns None if dst is not reachable from src
         """ 
-        # TODO: implement this function (and remove the line "raise NotImplementedError").
-        raise NotImplementedError
+        Been_there=[]
+        To_explore=[]
+        
+        To_explore.append((src,[src]))
+        
+        while len(To_explore)>0 :
+            if node not in Been_there:
+                
+                current, path_current=To_explore.pop()
+                
+                if current == dst:
+                    Been_there.append(Current)
+                    path_current.append(dst)
+                    return(path_current)
+                    
+                for node in self.graph[current]:  
+                    Been_there.append(node)
+                    path_current.append(node)
+                    To_explore.append((node, path_current))
+
+    
 
     @classmethod
     def graph_from_file(cls, file_name):
