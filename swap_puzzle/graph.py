@@ -104,7 +104,6 @@ class Graph:
         
         while len(To_explore)>0 :
             current, path_current=To_explore.pop(0)
-            print(To_explore)
             Been_there.append(current)
             if current == dst:
                 Been_there.append(current)

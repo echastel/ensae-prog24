@@ -97,11 +97,14 @@ class Grid():
         for i in cell_pair_list:
             self.swap(i[0],i[1])
     
-    def Grid_as_tuple (self) : 
-        Grid_tuple = tuple(i for i in self.state)
+    def Grid_to_tuple(self,G1):
+        Sum=[]
+        for i in G1:
+            Sum+=i
+        Grid_tuple = tuple(Sum)
         return Grid_tuple
 
-    def get_graph (self) :
+    def get_graph(self):
         Dots=[]
         for i in self.state :
             for j in i :
@@ -127,19 +130,21 @@ class Grid():
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
             i1,j1=pos1[0],pos1[1]
             i2,j2=pos2[0],pos2[1]
-            G1=self.list_to_grid(G1)
-            G2=self.list_to_grid(G2)
+            G1=self.tuple_to_Grid(G1)
+            G2=self.tuple_to_Grid(G2)
             if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
                 return False
         return True
 
-    def list_to_grid (self,G) :
-        L=[G[0:self.n]]
+    def tuple_to_Grid (self,G) :
+        L=[[]]
+        for k in G[0:self.n]:
+            L[0].append(k)
         for i in range (1,self.m):
-            L.append (G[i*self.n:(i+1)*self.n])
+            L.append([])
+            for k in G[i*self.n:(i+1)*self.n]:
+                L[i].append(k)
         return L
-
-
 
     def position (self,value):
         for i in range (self.m):
@@ -162,12 +167,12 @@ class Grid():
             Solves the grid and returns the sequence of swaps at the format 
             [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
             """
-            sorted=Grid(self.m,self.n)
+            solved=Grid(self.m,self.n)
             Solution=[] 
         
             for k in range (1, self.m*self.n+1):
                     (i,j)=self.position(k) #the position of the value k in the given grid
-                    goal= sorted.position(k)
+                    goal= solved.position(k)
                     print((i,j))
                     if j> goal[1]: # if the value is too much to the right
                             for left in range (j-goal[1]):
@@ -186,11 +191,31 @@ class Grid():
             return Solution 
 
     def get_solution2 (self):
+        solved=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
+        dst=self.Grid_to_tuple(solved)
+        src=self.Grid_to_tuple(self.state)
         G=self.get_graph()
-        Seq=G.bfs( "to add")
+        Seq=G.bfs(src,dst)
         Seq_Grid=[]
         for i in Seq:
-            Seq_Grid.append(list_to_grid(i))
+            Seq_Grid.append(self.tuple_to_Grid(i))
+        Solution=[]
+        for k in range(len(Seq)-1):
+            Solution.append(self.find_swap(Seq_Grid[k],Seq_Grid[k+1]))
+        return Solution
+    
+    def find_swap(self,G1,G2):
+        print(G1,G2)
+        for i in range (len(G1)) :
+            for j in range (len(G1)) :
+                if G1[i][j] != G2[i][j]:
+                    if j+1<self.n:
+                        if G1[i][j]==G2[i][j+1] :
+                            return ((i,j),(i,j+1))
+                    elif i+1<self.m:
+                        if G1[i][j]==G2[i+1][j] :
+                            return ((i,j),(i+1,j))
+
     @classmethod
     def grid_from_file(cls, file_name): 
         """

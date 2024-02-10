@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import itertools
+from graph import Graph
 
 print("Hello world")
 
@@ -12,7 +13,7 @@ from grid import Grid
 g = Grid(2, 3)
 print(g)
 
-data_path = "/home/onyxia/work/ensae-prog24/input/"  #j'ai changé ce code parce que la version antérieure avec ..\input\ ne marchait pas 
+data_path = "/home/onyxia/ensae-prog24/input/"  #j'ai changé ce code parce que la version antérieure avec ..\input\ ne marchait pas 
 file_name = data_path + "grid0.in"
 
 print(file_name)
@@ -24,16 +25,23 @@ chgmts=g0.get_solution()
 print(chgmts)
 print (g0)
 
-g2=Grid.grid_from_file("/home/onyxia/work/ensae-prog24/input/grid2.in")
-print(g2)
-g2sort=g2.get_solution()
-
-print(g2sort)
+g2=Grid.grid_from_file("/home/onyxia/ensae-prog24/input/grid2.in")
 print(g2)
 
 g0_unchanged= Grid.grid_from_file(file_name)
 
-print(g0.Grid_as_tuple())
-print(g2.Grid_as_tuple())
+gr1=Graph.graph_from_file("/home/onyxia/ensae-prog24/input/graph1.in")
+print(gr1)
+path12_13=gr1.bfs(12,13)
+print(path12_13)
 
-g0_unchanged.get_graph()
+print(g0_unchanged)
+
+print(g0_unchanged.tuple_to_Grid((1,2,3,4)))
+A=g0_unchanged.get_graph()
+print(A.bfs((2,4,3,1),(1,2,3,4)))
+
+print(g0_unchanged.get_solution2())
+g0_unchanged.swap_seq(g0_unchanged.get_solution2())
+print(g0_unchanged)
+
