@@ -77,7 +77,7 @@ class Grid():
             The two cells to swap. They must be in the format (i, j) where i is the line and j the column number of the cell. 
         """
         i1,j1,i2,j2=cell1[0],cell1[1],cell2[0],cell2[1]
-        if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
+        if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :# we make sure the swap is "legal"
             print(f"swap",(i1,j1),(i2,j2), "is impossible")
         else : 
             old_cell1= self.state[i1][j1]
@@ -94,10 +94,21 @@ class Grid():
             List of swaps, each swap being a tuple of two cells (each cell being a tuple of integers). 
             So the format should be [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...].
         """
+        #we're just calling several times the swap method we just defined to make this new method
         for i in cell_pair_list:
             self.swap(i[0],i[1])
     
     def Grid_to_tuple(self,G1):
+        """
+        "Transforms" a grid into a tuple.
+        Returns a tuple that lists the numbers in the grid, 
+        (from the top left corner to the bottom right corner) 
+
+        Parameters: 
+        -----------
+        G1: Grid
+            The grid you want to transform in a tuple (has to be the same size as "self")
+        """
         Sum=[]
         for i in G1:
             Sum+=i
@@ -105,12 +116,17 @@ class Grid():
         return Grid_tuple
 
     def get_graph(self):
+        """
+        Returns a graph where the nodes are all the possible states the grid could be in
+
+        """
         Dots=[]
         for i in self.state :
             for j in i :
                 Dots.append(j)
+        #Dots is a list of the nodes
         Nodes = list(itertools.permutations(Dots))
-        self.graph=Graph(Nodes)
+        self.graph=Graph(Nodes)  #we're defining the attribute graph of the class grid
         L=len(Nodes)
         for i in range(L) :
             for j in range(i+1,L) :
@@ -119,13 +135,28 @@ class Grid():
         return(self.graph)
 
     def there_is_a_swap(self,G1,G2):
+        """
+        Determines if two grids are separated only by a swap, 
+        i.e. if you can go from the grid G1 to the grid G2 by swapping to numbers in G1
+        Parameters: 
+        -----------
+        G1: tuple
+            The ordered tuple of the nodes of the first grid(has to be the same size as "self")
+            you want to compare with G2 to see if you could go from G1 to G2 with a single swap.
+        G2: tuple
+            The ordered tuple of the nodes of the second grid(has to be the same size as "self")
+            you want to compare with G1 to see if you could go from G1 to G2 with a single swap.
+        """
+
         diff=[]
         for i in range (len(G1)):
             if G1[i]!=G2[i] :
                 diff.append(i)
-        if len(diff)!=2:
+        if len(diff)!=2: 
             return False
-        else : 
+        else : #we made sure that exactly two numbers had changed positions between G1 and G2
+            #now we convert the respective indexes of the two differences into their position
+            # in the grid
             pos1=(diff[0]//self.n,diff[0]%self.n-1)
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
             i1,j1=pos1[0],pos1[1]
@@ -137,6 +168,15 @@ class Grid():
         return True
 
     def tuple_to_Grid (self,G) :
+        """
+        "transforms" a tuple into a grid.
+        Returns a list[list[int]] with the numbers in the order described by the tuple
+
+        Parameters: 
+        -----------
+        G: tuple
+            The tuple is ordered, the grid this method returns will have the same dimension as "self"
+        """
         L=[[]]
         for k in G[0:self.n]:
             L[0].append(k)
@@ -147,6 +187,16 @@ class Grid():
         return L
 
     def position (self,value):
+        """
+        Returns a tuple (i,j) representing the position of "value" in the grid
+        i is the lign "value" is in 
+        j is the column "value" is in 
+
+        Parameters: 
+        -----------
+        value: int
+            The value whose position you want to get
+        """
         for i in range (self.m):
             for j in range (self.n):
                 if self.state[i][j]==value:
@@ -191,6 +241,10 @@ class Grid():
             return Solution 
 
     def get_solution2 (self):
+        """
+            Solves the grid and returns the sequence of swaps at the format 
+            [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
+        """
         solved=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
         dst=self.Grid_to_tuple(solved)
         src=self.Grid_to_tuple(self.state)
@@ -205,9 +259,22 @@ class Grid():
         return Solution
     
     def find_swap(self,G1,G2):
+        """
+        Determines the swap that allows you to go 
+        from the grid in the state G1 
+        to the grid in the state G2 
+        
+        Parameters: 
+        -----------
+        G1: Grid
+            
+        G2: Grid
+            
+        """
+        
         print(G1,G2)
         for i in range (len(G1)) :
-            for j in range (len(G1)) :
+            for j in range (len(G1[0])) :
                 if G1[i][j] != G2[i][j]:
                     if j+1<self.n:
                         if G1[i][j]==G2[i][j+1] :
