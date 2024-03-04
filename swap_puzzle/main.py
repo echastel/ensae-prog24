@@ -41,10 +41,13 @@ l2c= [[7,5,3],[4,8,6],[1,2,9]]
 l2= [[7,5,3],[1,8,6],[4,2,9]]
 
 gridtest=Grid(2,2,[[3,1],[2,4]])
+print(gridtest)
+#print(g2.find_swap(l2,l2c))
 
-print(g2.find_swap(l2,l2c))
+#print(gridtest.get_solution2())
+#print(g2.swap_matrix(l2,((1,0),(2,0))))
+#print(g2.get_solution_q8())
 
-print(gridtest.get_solution2())
-print(g2.swap_matrix(l2,((1,0),(2,0))))
-print(g2.get_solution_q8())
-return([((0, 0), (1, 0)), ((1, 0), (2, 0)), ((1, 1), (2, 1)), ((0, 1), (1, 1))]==print(g2.get_solution_q8()))
+#return([((0, 0), (1, 0)), ((1, 0), (2, 0)), ((1, 1), (2, 1)), ((0, 1), (1, 1))]==print(g2.get_solution_q8()))
+#print(gridtest.a_star())
+print(gridtest.heuristic(gridtest.state))

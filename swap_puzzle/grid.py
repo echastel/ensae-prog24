@@ -162,6 +162,10 @@ class Grid():
             # in the grid
             pos1=(diff[0]//self.n,diff[0]%self.n-1)
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
+            if pos1[1]==-1:
+                pos1[0],pos1[1]=pos1[0]-1,self.n-1
+            if pos1[1]==-1:
+                pos1[0],pos1[1]=pos1[0]-1,self.n-1
             i1,j1=pos1[0],pos1[1]
             i2,j2=pos2[0],pos2[1]
             G1=self.tuple_to_matrix(G1)
@@ -335,6 +339,58 @@ class Grid():
                     if i+1<self.m:
                         if G1[i][j]==G2[i+1][j] :
                             return ((i,j),(i+1,j))
+
+    def a_star(self):
+        """
+        Finds a path from self.state to solved by BFS.  
+
+        Output: 
+        -------
+        path_current: list[tuple(tuple)] | None
+            The shortest swap sequence from src to dst. Returns None if dst is not reachable from src
+        """ 
+        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
+        src=self.state
+        list_of_swaps=[]
+        for i in range (self.m -1):
+            for j in range(self.n -1):
+                list_of_swaps.append(((i,j),(i,j+1)))
+                list_of_swaps.append(((i,j),(i+1,j)))
+        list_of_swaps.append(((self.m-1,self.n-2),(self.m-1,self.n-1)))
+        list_of_swaps.append(((self.m-2,self.n-1),(self.m-1,self.n-1)))
+        
+        
+        Been_there=[]
+        To_explore=(src,self.heuristic(src),[src])
+        
+        
+        while (To_explore[1])>0 :
+            Been_there.append(To_explore[0])
+            current, heur, path_current=To_explore[0],To_explore[1],To_explore[2]
+            if heur == 0:
+                Been_there.append(To_explore[0])
+                return(path_current)
+
+            min_dist=heur            
+            for i in list_of_swaps: 
+                neighbor= self.swap_matrix(current,i)
+                if neighbor not in Been_there :
+                    new_heur=self.heuristic(neighbor)
+                    if new_heur<min_dist :
+                        New_path=copy.deepcopy(path_current)+[i]
+                        To_explore=(neighbor,new_heur,New_path)
+                        min_dist=new_heur
+        return None
+
+    def heuristic(self, node):
+        d=0
+        for i in range(self.n): 
+            for j in range(self.m):
+                value=node[i][j]
+                goal= (value//self.n,value%self.n-1)
+                d+=((i-goal[0])^2)+((j-goal[1])^2)
+        return d
+            
 
     @classmethod
     def grid_from_file(cls, file_name): 
