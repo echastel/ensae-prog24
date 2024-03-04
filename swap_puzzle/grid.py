@@ -5,6 +5,7 @@ from graph import Graph
 import random
 import matplotlib.pyplot as plt
 import itertools
+import copy
 
 class Grid():
     """
@@ -98,7 +99,7 @@ class Grid():
         for i in cell_pair_list:
             self.swap(i[0],i[1])
     
-    def Grid_to_tuple(self,G1):
+    def matrix_to_tuple(self,G1):
         """
         "Transforms" a grid into a tuple.
         Returns a tuple that lists the numbers in the grid, 
@@ -106,8 +107,8 @@ class Grid():
 
         Parameters: 
         -----------
-        G1: Grid
-            The grid you want to transform in a tuple (has to be the same size as "self")
+        G1: list
+            The list you want to transform in a tuple (has to be the same size as "self")
         """
         Sum=[]
         for i in G1:
@@ -133,6 +134,8 @@ class Grid():
                 if self.there_is_a_swap(Nodes[i],Nodes[j]) :
                     self.graph.add_edge(Nodes[i],Nodes[j])
         return(self.graph)
+
+    
 
     def there_is_a_swap(self,G1,G2):
         """
@@ -161,13 +164,13 @@ class Grid():
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
             i1,j1=pos1[0],pos1[1]
             i2,j2=pos2[0],pos2[1]
-            G1=self.tuple_to_Grid(G1)
-            G2=self.tuple_to_Grid(G2)
+            G1=self.tuple_to_matrix(G1)
+            G2=self.tuple_to_matrix(G2)
             if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
                 return False
         return True
 
-    def tuple_to_Grid (self,G) :
+    def tuple_to_matrix (self,G) :
         """
         "transforms" a tuple into a grid.
         Returns a list[list[int]] with the numbers in the order described by the tuple
@@ -246,18 +249,68 @@ class Grid():
             [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
         """
         solved=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
-        dst=self.Grid_to_tuple(solved)
-        src=self.Grid_to_tuple(self.state)
+        dst=self.matrix_to_tuple(solved)
+        src=self.matrix_to_tuple(self.state)
         G=self.get_graph()
         Seq=G.bfs(src,dst)
         Seq_Grid=[]
         for i in Seq:
-            Seq_Grid.append(self.tuple_to_Grid(i))
+            Seq_Grid.append(self.tuple_to_matrix(i))
         Solution=[]
         for k in range(len(Seq)-1):
             Solution.append(self.find_swap(Seq_Grid[k],Seq_Grid[k+1]))
         return Solution
+
+    def get_solution_q8(self):
+        
+        """
+        Finds a shortest path from self.state to solved by BFS.  
+
+        Output: 
+        -------
+        path_current: list[tuple(tuple)] | None
+            The shortest swap sequence from src to dst. Returns None if dst is not reachable from src
+        """ 
+        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
+        src=self.state
+        list_of_swaps=[]
+        for i in range (self.m -1):
+            for j in range(self.n -1):
+                list_of_swaps.append(((i,j),(i,j+1)))
+                list_of_swaps.append(((i,j),(i+1,j)))
+        list_of_swaps.append(((self.m-1,self.n-2),(self.m-1,self.n-1)))
+        list_of_swaps.append(((self.m-2,self.n-1),(self.m-1,self.n-1)))
+        
+        
+        Been_there=[]
+        To_explore=[]
+        
+        
+        To_explore.append((src,[]))
+        
+        while len(To_explore)>0 :
+            current, path_current=To_explore.pop(0)
+            Been_there.append(current)
+            if current == dst:
+                Been_there.append(current)
+                return(path_current)
+                        
+            for i in list_of_swaps: 
+                neighbor= self.swap_matrix(current,i)
+                if neighbor not in Been_there and neighbor not in [i[0] for i in To_explore]:
+                    New_path=copy.deepcopy(path_current)+[i]
+                    To_explore.append((neighbor, New_path))
+        return None
     
+    def swap_matrix(self, matrix, swap):
+        point1=swap[0]
+        
+        point2=swap[1]
+        
+        new_matrix=copy.deepcopy(matrix)
+        new_matrix[point1[0]][point1[1]],new_matrix[point2[0]][point2[1]]= matrix[point2[0]][point2[1]],matrix[point1[0]][point1[1]]
+        return(new_matrix)
+
     def find_swap(self,G1,G2):
         """
         Determines the swap that allows you to go 
@@ -266,9 +319,9 @@ class Grid():
         
         Parameters: 
         -----------
-        G1: Grid
+        G1: list
             
-        G2: Grid
+        G2: list
             
         """
         
@@ -279,7 +332,7 @@ class Grid():
                     if j+1<self.n:
                         if G1[i][j]==G2[i][j+1] :
                             return ((i,j),(i,j+1))
-                    elif i+1<self.m:
+                    if i+1<self.m:
                         if G1[i][j]==G2[i+1][j] :
                             return ((i,j),(i+1,j))
 

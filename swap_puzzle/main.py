@@ -29,7 +29,7 @@ print(path12_13)
 
 print(g0_unchanged)
 
-print(g0_unchanged.tuple_to_Grid((1,2,3,4)))
+print(g0_unchanged.tuple_to_matrix((1,2,3,4)))
 A=g0_unchanged.get_graph()
 print(A.bfs((2,4,3,1),(1,2,3,4)))
 
@@ -37,5 +37,14 @@ print(g0_unchanged.get_solution2())
 g0_unchanged.swap_seq(g0_unchanged.get_solution2())
 print(g0_unchanged)
 
+l2c= [[7,5,3],[4,8,6],[1,2,9]]
+l2= [[7,5,3],[1,8,6],[4,2,9]]
 
+gridtest=Grid(2,2,[[3,1],[2,4]])
 
+print(g2.find_swap(l2,l2c))
+
+print(gridtest.get_solution2())
+print(g2.swap_matrix(l2,((1,0),(2,0))))
+print(g2.get_solution_q8())
+return([((0, 0), (1, 0)), ((1, 0), (2, 0)), ((1, 1), (2, 1)), ((0, 1), (1, 1))]==print(g2.get_solution_q8()))
