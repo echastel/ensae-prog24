@@ -99,18 +99,24 @@ class Graph:
         """ 
         Been_there=[]
         To_explore=[]
+        # To_explore is a file containing tuples. 
+        # Each tuple contains : (current node, [list of nodes you have to visit to get to current node])
         
         To_explore.append((src,[src]))
         
         while len(To_explore)>0 :
-            current, path_current=To_explore.pop(0)
+            current, path_current=To_explore.pop(0) 
+            # we visit the first node in the file, so we remove it from To_explore
             Been_there.append(current)
-            if current == dst:
+            if current == dst: # if the node we're exploring is the destination, we return the path that led to it
                 Been_there.append(current)
                 return(path_current)
                         
             for neighbor in self.graph[current]:  
                 if neighbor not in Been_there and neighbor not in [i[0] for i in To_explore]:
+                    #if neigbor hasn't already been explored 
+                    # and isn't already amongst the nodes we have planned to exlore, 
+                    # then we add it to the list of nodes we have to explore 
                     New_path=copy.deepcopy(path_current)+[neighbor]
                     To_explore.append((neighbor, New_path))
         return None

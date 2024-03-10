@@ -58,7 +58,7 @@ class Grid():
 
     def is_sorted(self):
         """
-        Checks is the current state of the grid is sorte and returns the answer as a boolean.
+        Checks if the current state of the grid is sorted and returns the answer as a boolean.
         """
         k=1
         for i in range (self.m):
@@ -108,7 +108,11 @@ class Grid():
         Parameters: 
         -----------
         G1: list
-            The list you want to transform in a tuple (has to be the same size as "self")
+            The list you want to transform into a tuple (has to be the same size as "self")
+        Output: 
+        -------
+        Grid_tuple: tuple
+            A tuple containing the values in the grid in the order they appear in self.state
         """
         Sum=[]
         for i in G1:
@@ -125,7 +129,8 @@ class Grid():
         Dots=[i for i in range (1,self.m*self.n+1)]
         #Dots is a list of the values
         Nodes = list(itertools.permutations(Dots))
-        self.graph=Graph(Nodes)  #we're defining the attribute graph of the class grid
+        self.graph=Graph(Nodes)  
+        #we're defining the attribute graph of the class grid and creating a graph with all the states of the grid
         L=len(Nodes)
         for i in range(L) :
             for j in range(i+1,L) :
@@ -183,7 +188,12 @@ class Grid():
         Parameters: 
         -----------
         G: tuple
-            The tuple is ordered, the grid this method returns will have the same dimension as "self"
+            The tuple is ordered
+
+        Output: 
+        -------
+        L: list[]
+            Transforms a tuple into a matrix (list of lists) of the same size as self.state
         """
         L=[[]]
         for k in G[0:self.n]:
