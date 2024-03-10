@@ -5,8 +5,8 @@ sys.path.append("swap_puzzle/")
 import unittest 
 from graph import Graph
 
-class Test_bfs(unittest.TestCase):
-    def test_bfs(self):
+class Test_q8(unittest.TestCase):
+    def test_g2q8(self):
         gr1=Graph.graph_from_file("/home/onyxia/ensae-prog24/input/graph1.in")
         path12_13=gr1.bfs(12,13)
         path1_18=gr1.bfs(1,18)

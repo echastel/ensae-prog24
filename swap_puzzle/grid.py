@@ -58,7 +58,7 @@ class Grid():
 
     def is_sorted(self):
         """
-        Checks is the current state of the grid is sorte and returns the answer as a boolean.
+        Checks if the current state of the grid is sorted and returns the answer as a boolean.
         """
         k=1
         for i in range (self.m):
@@ -108,7 +108,11 @@ class Grid():
         Parameters: 
         -----------
         G1: list
-            The list you want to transform in a tuple (has to be the same size as "self")
+            The list you want to transform into a tuple (has to be the same size as "self")
+        Output: 
+        -------
+        Grid_tuple: tuple
+            A tuple containing the values in the grid in the order they appear in self.state
         """
         Sum=[]
         for i in G1:
@@ -118,19 +122,19 @@ class Grid():
 
     def get_graph(self):
         """
-        Returns a graph where the nodes are all the possible states the grid could be in
+        Returns a graph where the nodes are all the possible states the grid could be in,
+        and with edges between two states of the grid separated only by one swap
 
         """
-        Dots=[]
-        for i in self.state :
-            for j in i :
-                Dots.append(j)
-        #Dots is a list of the nodes
+        Dots=[i for i in range (1,self.m*self.n+1)]
+        #Dots is a list of the values
         Nodes = list(itertools.permutations(Dots))
-        self.graph=Graph(Nodes)  #we're defining the attribute graph of the class grid
+        self.graph=Graph(Nodes)  
+        #we're defining the attribute graph of the class grid and creating a graph with all the states of the grid
         L=len(Nodes)
         for i in range(L) :
             for j in range(i+1,L) :
+                #we add edges between the states of the grid separated bby exactly one swap
                 if self.there_is_a_swap(Nodes[i],Nodes[j]) :
                     self.graph.add_edge(Nodes[i],Nodes[j])
         return(self.graph)
@@ -139,9 +143,10 @@ class Grid():
 
     def there_is_a_swap(self,G1,G2):
         """
-        Determines if two grids are separated only by a swap, 
+        Determines if two grids are separated only by a swap,
         i.e. if you can go from the grid G1 to the grid G2 by swapping to numbers in G1
-        Parameters: 
+
+        Parameters:
         -----------
         G1: tuple
             The ordered tuple of the nodes of the first grid(has to be the same size as "self")
@@ -149,25 +154,30 @@ class Grid():
         G2: tuple
             The ordered tuple of the nodes of the second grid(has to be the same size as "self")
             you want to compare with G1 to see if you could go from G1 to G2 with a single swap.
-        """
 
+        """
         diff=[]
         for i in range (len(G1)):
             if G1[i]!=G2[i] :
                 diff.append(i)
-        if len(diff)!=2: 
+        if len(diff)!=2:
             return False
         else : #we made sure that exactly two numbers had changed positions between G1 and G2
             #now we convert the respective indexes of the two differences into their position
             # in the grid
             pos1=(diff[0]//self.n,diff[0]%self.n-1)
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
+            if pos1[1]==-1:
+                A,B=pos1[0]-1,self.n-1
+                pos1=(A,B)
+                C,D=pos2[0]-1,self.n-1
+                pos2=(C,D)
             i1,j1=pos1[0],pos1[1]
             i2,j2=pos2[0],pos2[1]
-            G1=self.tuple_to_matrix(G1)
-            G2=self.tuple_to_matrix(G2)
+
             if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
                 return False
+
         return True
 
     def tuple_to_matrix (self,G) :
@@ -178,7 +188,12 @@ class Grid():
         Parameters: 
         -----------
         G: tuple
-            The tuple is ordered, the grid this method returns will have the same dimension as "self"
+            The tuple is ordered
+
+        Output: 
+        -------
+        L: list[]
+            Transforms a tuple into a matrix (list of lists) of the same size as self.state
         """
         L=[[]]
         for k in G[0:self.n]:
@@ -249,8 +264,8 @@ class Grid():
             [((i1, j1), (i2, j2)), ((i1', j1'), (i2', j2')), ...]. 
         """
         solved=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
-        dst=self.matrix_to_tuple(solved)
-        src=self.matrix_to_tuple(self.state)
+        dst=self.matrix_to_tuple(solved)#solved grid in tuple format
+        src=self.matrix_to_tuple(self.state)# self in tuple format
         G=self.get_graph()
         Seq=G.bfs(src,dst)
         Seq_Grid=[]
@@ -271,9 +286,10 @@ class Grid():
         path_current: list[tuple(tuple)] | None
             The shortest swap sequence from src to dst. Returns None if dst is not reachable from src
         """ 
-        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
+        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] #solved grid
         src=self.state
         list_of_swaps=[]
+        #we are creating a list[tuple(tuple)] containing all the swaps that can be done in amy grid of this size
         for i in range (self.m -1):
             for j in range(self.n -1):
                 list_of_swaps.append(((i,j),(i,j+1)))
@@ -291,22 +307,43 @@ class Grid():
         while len(To_explore)>0 :
             current, path_current=To_explore.pop(0)
             Been_there.append(current)
+
+            #if the gris we're examining now id the solved grid, we return the path that led to it.
             if current == dst:
                 Been_there.append(current)
                 return(path_current)
                         
             for i in list_of_swaps: 
+                #for every possible swap, we create the corresponding grid, neighbor
                 neighbor= self.swap_matrix(current,i)
                 if neighbor not in Been_there and neighbor not in [i[0] for i in To_explore]:
+                    #we add neigbor to the list of grids to explore
                     New_path=copy.deepcopy(path_current)+[i]
+                    # to find the sequence of swaps needed to get neigbor, 
+                    # we add current to the sequence of swaps needed to get to current
                     To_explore.append((neighbor, New_path))
         return None
     
     def swap_matrix(self, matrix, swap):
+        """
+        Swaps two cells of a grid.
+        
+        Parameters: 
+        -----------
+        matrix: list
+            The grid in the format of a list[list] whose cells you want to swap.
+        
+        swap: tuple
+            A tuple containing the coordinates in the grid of the two cells you want to swap. 
+            The tuple is a tuple of two tuples.
+
+        Output: 
+        -------
+        new_matrix: Grid
+            The matrix you gave in input after you swapped the two cells you wanted to swap
+        """
         point1=swap[0]
-        
         point2=swap[1]
-        
         new_matrix=copy.deepcopy(matrix)
         new_matrix[point1[0]][point1[1]],new_matrix[point2[0]][point2[1]]= matrix[point2[0]][point2[1]],matrix[point1[0]][point1[1]]
         return(new_matrix)
@@ -315,7 +352,8 @@ class Grid():
         """
         Determines the swap that allows you to go 
         from the grid in the state G1 
-        to the grid in the state G2 
+        to the grid in the state G2.
+        G1 and G2 are separated by exactly one swap.
         
         Parameters: 
         -----------
@@ -326,6 +364,7 @@ class Grid():
         """
         
         print(G1,G2)
+        # we're going to look for cells that do not have the same value in G1 and in G2
         for i in range (len(G1)) :
             for j in range (len(G1[0])) :
                 if G1[i][j] != G2[i][j]:
@@ -335,6 +374,86 @@ class Grid():
                     if i+1<self.m:
                         if G1[i][j]==G2[i+1][j] :
                             return ((i,j),(i+1,j))
+
+    def a_star(self):
+        """
+        Finds a path from self.state to solved.  
+
+        Output:
+        -------
+        path_current: list[tuple(tuple)] | None
+            The shortest swap sequence from self to the solved grid. 
+            Returns None if the solved gris is not reachable from self.state
+        """
+        
+        src=self.state
+        list_of_swaps=[]
+        #we are creating a list[tuple(tuple)] containing all the swaps that can be done in amy grid of this size
+        for i in range (self.m):
+            for j in range(self.n):
+                if i==self.m-1 and j<self.n-1:
+                    list_of_swaps.append(((i,j),(i,j+1)))
+                elif i<self.m-1 and j==self.n-1:
+                    list_of_swaps.append(((i,j),(i+1,j)))
+                elif i!=self.m-1 and j!=self.n-1:
+                    list_of_swaps.append(((i,j),(i,j+1)))
+                    list_of_swaps.append(((i,j),(i+1,j)))
+
+        Been_there=[]
+        To_explore=(src,self.heuristic(src),[])
+
+        while (To_explore[1])>0 : # = while we have not reached the solved grid
+            Been_there.append(To_explore[0])
+            current, heur, path_current=To_explore[0],To_explore[1],To_explore[2]
+
+            min_dist=heur 
+            #initialization of min_dist, the minimal distance between 
+            # grids distant of only one swap from the current grid and the solved grid      
+            for i in list_of_swaps:
+                #for all the swaps,
+                # we look if the grid created by swapping 2 cells is closer to the solved grid
+                #than the grid we had before
+                neighbor= self.swap_matrix(current,i) 
+                if neighbor not in Been_there :
+                    new_heur=self.heuristic(neighbor)
+                    if new_heur<=min_dist :
+                        New_path=copy.deepcopy(path_current)
+                        New_path.append(i)
+                        To_explore=(neighbor,new_heur,New_path)
+                        min_dist=new_heur
+                    if new_heur == 0:
+                        Been_there.append(To_explore[0])
+                        return(New_path)
+        return None
+
+ 
+
+    def heuristic(self, node):
+        """
+        Determines the euclidian distance between the grid node and the solved grid
+        
+        Parameters: 
+        -----------
+        node: list
+            The grid in the format of a list[list]. 
+
+        Output: 
+        -------
+        d: int
+            the distance between node and the solved grid. 
+        """
+        d=0
+        for i in range(self.m):
+            for j in range(self.n):
+                value=node[i][j]
+                if value%self.n==0:
+                    goal= (value//self.n-1,self.n-1)
+                else:
+                    goal=(value//self.n,value%self.n-1)
+                d=d+(((i-goal[0])**2)+((j-goal[1])**2))
+        return d
+   
+            
 
     @classmethod
     def grid_from_file(cls, file_name): 
