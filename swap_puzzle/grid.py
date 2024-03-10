@@ -139,9 +139,10 @@ class Grid():
 
     def there_is_a_swap(self,G1,G2):
         """
-        Determines if two grids are separated only by a swap, 
+        Determines if two grids are separated only by a swap,
         i.e. if you can go from the grid G1 to the grid G2 by swapping to numbers in G1
-        Parameters: 
+
+        Parameters:
         -----------
         G1: tuple
             The ordered tuple of the nodes of the first grid(has to be the same size as "self")
@@ -149,13 +150,13 @@ class Grid():
         G2: tuple
             The ordered tuple of the nodes of the second grid(has to be the same size as "self")
             you want to compare with G1 to see if you could go from G1 to G2 with a single swap.
-        """
 
+        """
         diff=[]
         for i in range (len(G1)):
             if G1[i]!=G2[i] :
                 diff.append(i)
-        if len(diff)!=2: 
+        if len(diff)!=2:
             return False
         else : #we made sure that exactly two numbers had changed positions between G1 and G2
             #now we convert the respective indexes of the two differences into their position
@@ -163,15 +164,16 @@ class Grid():
             pos1=(diff[0]//self.n,diff[0]%self.n-1)
             pos2=(diff[1]//self.n,diff[1]%self.n-1)
             if pos1[1]==-1:
-                pos1[0],pos1[1]=pos1[0]-1,self.n-1
-            if pos1[1]==-1:
-                pos1[0],pos1[1]=pos1[0]-1,self.n-1
+                A,B=pos1[0]-1,self.n-1
+                pos1=(A,B)
+                C,D=pos2[0]-1,self.n-1
+                pos2=(C,D)
             i1,j1=pos1[0],pos1[1]
             i2,j2=pos2[0],pos2[1]
-            G1=self.tuple_to_matrix(G1)
-            G2=self.tuple_to_matrix(G2)
+
             if i1>self.m or i2>self.m or j1>self.n or j2>self.n or (abs(i1-i2)+abs(j1-j2)>1) :
                 return False
+
         return True
 
     def tuple_to_matrix (self,G) :
@@ -307,6 +309,23 @@ class Grid():
         return None
     
     def swap_matrix(self, matrix, swap):
+        """
+        Swaps two cells of a grid.
+        
+        Parameters: 
+        -----------
+        matrix: list
+            The grid in the format of a list[list] whose cells you want to swap.
+        
+        swap: tuple
+            A tuple containing the coordinates in the grid of the two cells you want to swap. 
+            The tuple is a tuple of two tuples.
+
+        Output: 
+        -------
+        new_matrix: Grid
+            The matrix you gave in input after you swapped the two cells you wanted to swap
+        """
         point1=swap[0]
         
         point2=swap[1]
@@ -344,52 +363,60 @@ class Grid():
         """
         Finds a path from self.state to solved by BFS.  
 
-        Output: 
+        Output:
         -------
         path_current: list[tuple(tuple)] | None
             The shortest swap sequence from src to dst. Returns None if dst is not reachable from src
-        """ 
-        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)] 
+        """
+        dst=[list(range(i*self.n+1, (i+1)*self.n+1)) for i in range(self.m)]
         src=self.state
         list_of_swaps=[]
-        for i in range (self.m -1):
-            for j in range(self.n -1):
-                list_of_swaps.append(((i,j),(i,j+1)))
-                list_of_swaps.append(((i,j),(i+1,j)))
-        list_of_swaps.append(((self.m-1,self.n-2),(self.m-1,self.n-1)))
-        list_of_swaps.append(((self.m-2,self.n-1),(self.m-1,self.n-1)))
-        
-        
+        for i in range (self.m):
+            for j in range(self.n):
+                if i==self.m-1 and j<self.n-1:
+                    list_of_swaps.append(((i,j),(i,j+1)))
+                elif i<self.m-1 and j==self.n-1:
+                    list_of_swaps.append(((i,j),(i+1,j)))
+                elif i!=self.m-1 and j!=self.n-1:
+                    list_of_swaps.append(((i,j),(i,j+1)))
+                    list_of_swaps.append(((i,j),(i+1,j)))
+
         Been_there=[]
-        To_explore=(src,self.heuristic(src),[src])
-        
-        
+        To_explore=(src,self.heuristic(src),[])
+
         while (To_explore[1])>0 :
             Been_there.append(To_explore[0])
             current, heur, path_current=To_explore[0],To_explore[1],To_explore[2]
-            if heur == 0:
-                Been_there.append(To_explore[0])
-                return(path_current)
 
             min_dist=heur            
-            for i in list_of_swaps: 
+            for i in list_of_swaps:
                 neighbor= self.swap_matrix(current,i)
                 if neighbor not in Been_there :
                     new_heur=self.heuristic(neighbor)
-                    if new_heur<min_dist :
-                        New_path=copy.deepcopy(path_current)+[i]
+                    if new_heur<=min_dist :
+                        New_path=copy.deepcopy(path_current)
+                        New_path.append(i)
                         To_explore=(neighbor,new_heur,New_path)
                         min_dist=new_heur
+                    if new_heur == 0:
+                        Been_there.append(To_explore[0])
+                        return(New_path)
         return None
+
+ 
 
     def heuristic(self, node):
         d=0
-        for i in range(self.n): 
-            for j in range(self.m):
+        for i in range(self.m):
+            for j in range(self.n):
                 value=node[i][j]
-                goal= (value//self.n,value%self.n-1)
-                d+=((i-goal[0])^2)+((j-goal[1])^2)
+                if value%self.n==0:
+                    goal= (value//self.n-1,self.n-1)
+                else:
+                    goal=(value//self.n,value%self.n-1)
+                d=d+(((i-goal[0])**2)+((j-goal[1])**2))
         return d
+   
             
 
     @classmethod
